@@ -41,8 +41,7 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - restore-cache:
-         keys: [test-frontend]
+      - restore-cache: -
       -run:
         name: Run Frontend test
         command: |
