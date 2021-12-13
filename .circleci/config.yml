@@ -131,7 +131,7 @@ jobs:
             aws ec2 describe-instances  --query 'Reservations[*].Instances[*].PublicIpAddress' --output text  >> .circleci/ansible/inventory.txt
             #exit 1
       - persist_to_workspace:
-          root: ~/
+          root: .
           paths:
             -  Project3/.circleci/ansible/inventory.txt        
 workflows:
