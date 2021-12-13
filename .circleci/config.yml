@@ -132,7 +132,7 @@ jobs:
             #exit 1
       - persist_to_workspace:
           root: ~/
-          paths: /.circleci/ansible/inventory.txt   
+          paths: .circleci/ansible/inventory.txt   
                  
 workflows:
   default:
