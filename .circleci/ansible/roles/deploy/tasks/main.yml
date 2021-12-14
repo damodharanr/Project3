@@ -22,18 +22,23 @@
 - name: Transfer backend files cloud server
   become: true
   copy:
-    src: /root/project/backend/dist.tar.gz
+    #src: /root/project/backend/dist.tar.gz
+    src: /root/project/artifact.tar.gz
     dest: /home/ubuntu
 
 - name: Extract backend and start node server
   become: true
   shell: |
     cd /home/ubuntu
-    tar -xf dist.tar.gz
-    rm -rf dist.tar.gz
-    cd dist
-    npm i
-    pm2 start main.js --update-env
+    #tar -xf dist.tar.gz
+    #rm -rf dist.tar.gz
+    #cd dist
+    #npm i
+    #pm2 start main.js --update-env
+    #npm install
+    #pm2 stop default
+    #pm2 start npm -- start
+    tar -xf artifact.tar.gz
     npm install
     pm2 stop default
     pm2 start npm -- start
