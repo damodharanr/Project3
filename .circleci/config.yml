@@ -374,7 +374,6 @@ jobs:
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
             ansible-playbook -i inventory.txt node-exporter.yml
-      # Here's where you will add some code to rollback on failure
             export IP_a=$(aws ec2 describe-instances  --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             if curl "${IP_a}:3030/api/status" | grep "ok"
             then
@@ -382,6 +381,7 @@ jobs:
             else
             return 1
             fi
+            # Here's where you will add some code to rollback on failure
       - destroy_environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
       - revert_migrations:
