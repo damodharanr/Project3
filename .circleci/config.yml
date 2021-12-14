@@ -51,7 +51,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            status=$(curl -H "token: cfc9a7fe-81a0-4286-bfce-aabc7dda974d" --request GET https://api.memstash.io/values/migration_status__<<parameters.workflow_id>>)
+            status=$(curl -H "token: cfc9a7fe-81a0-4286-bfce-aabc7dda974d" --request GET https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID:0:7}>>)
               echo $status
               if [[ "$status" == "1" ]]
               then
@@ -281,7 +281,7 @@ jobs:
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
             echo "DB migration was successful"
-            curl -H "Content-Type: text/plain" -H "token: cfc9a7fe-81a0-4286-bfce-aabc7dda974d" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7}
+            curl -H "Content-Type: text/plain" -H "token: cfc9a7fe-81a0-4286-bfce-aabc7dda974d" --request PUT --data "1" https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID:0:7}
             else
               echo "DB migration failed"
               curl -H "Content-Type: text/plain" -H "token: cfc9a7fe-81a0-4286-bfce-aabc7dda974d" --request PUT --data "0" https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID:0:7}
@@ -366,6 +366,7 @@ jobs:
             npm i
             cd ..
             tar -czf dist.tar.gz dist
+            cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
             ansible-playbook -i inventory.txt node-exporter.yml
