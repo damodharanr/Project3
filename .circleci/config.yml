@@ -51,7 +51,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            status=$(curl -H "token: cfc9a7fe-81a0-4286-bfce-aabc7dda974d" --request GET https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID:0:7}>>)
+            status=$(curl -H "token: cfc9a7fe-81a0-4286-bfce-aabc7dda974d" --request GET https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID:0:7})
               echo $status
               if [[ "$status" == "1" ]]
               then
@@ -259,16 +259,6 @@ jobs:
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
             npm install
-            echo "DB host"
-            echo $TYPEORM_HOST
-            echo "DB port"
-            echo $TYPEORM_PORT
-            echo "DB name"
-            echo $TYPEORM_DATABASE
-            echo "DB username"
-            echo $TYPEORM_USERNAME
-            echo "DB password"
-            echo $TYPEORM_PASSWORD
             # Run and sve the migration output
             npm run migrations > migrations_dump.txt
             echo "***************Migrations dumps below************************w"
@@ -388,12 +378,13 @@ workflows:
      #     requires: [build-frontend]
      # - scan-backend:
      ##     requires: [build-backend] 
-     - deploy-infrastructure
-     - configure-infrastructure:
-           requires: [deploy-infrastructure]
-     - run-migrations:
-           requires: [configure-infrastructure]
-     - deploy-backend:
-           requires: [run-migrations]
-     - deploy-frontend:
-           requires: [run-migrations, deploy-backend]
+     #- deploy-infrastructure
+     #- configure-infrastructure:
+     #      requires: [deploy-infrastructure]
+     #- run-migrations:
+     #      requires: [configure-infrastructure]
+     #- deploy-backend:
+     #      requires: [run-migrations]
+     - deploy-backend
+     #- deploy-frontend:
+     #      requires: [run-migrations, deploy-backend]
