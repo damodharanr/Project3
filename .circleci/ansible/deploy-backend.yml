@@ -11,7 +11,7 @@
   roles:
     - deploy
  
- environment:
+  environment:
    ENVIRONMENT: production
    NODE_ENV: production
    TYPEORM_CONNECTION: "{{ lookup('env','TYPEORM_CONNECTION') }}"
