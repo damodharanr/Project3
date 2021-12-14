@@ -177,8 +177,8 @@ jobs:
             cat .circleci/ansible/inventory.txt
             #exit 1
       - persist_to_workspace:
-          root: ~/
-          paths: project/.circleci/ansible/inventory.txt
+          root: .
+          paths: .circleci/ansible/inventory.txt
       - destroy_environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"    
   configure-infrastructure:
@@ -191,7 +191,7 @@ jobs:
           fingerprints: ["e3:11:4f:ab:2a:78:cb:96:06:90:5c:37:dd:bf:fd:48"] # You can get this ID in the section where you registered the SSH Key
         # attach workspace
       - attach_workspace:
-          at: project/.circleci/ansible/
+          at: .
       - run:
           name: Install dependencies
           command: |
@@ -203,9 +203,10 @@ jobs:
             #exit 1
       - run:
           name: Configure server
+          working_directory: ./.circleci/ansible
           command: |
             # Your code here
-            cd .circleci/ansible
+            #cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
             #exit 1
