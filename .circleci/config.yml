@@ -61,9 +61,14 @@ commands:
              npm install
              npm run migrations:revert
             fi
-            echo "DB status="$status
-           
-              
+            if [[ "$status" == "0" ]]
+            then
+             cd backend
+             npm install
+             npm run migrations:revert
+            fi
+            echo "DB status=" $status
+                         
 jobs:
   build-frontend:
     docker:
