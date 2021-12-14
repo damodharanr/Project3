@@ -196,8 +196,8 @@ jobs:
             # your code here
             yum install -y tar gzip
             #yum install -y nodejs
-            yum install -y npm
-            yum install -y ansible
+            #yum install -y npm
+            #yum install -y ansible
       - run:
           name: Get backend url
           command: |
@@ -234,5 +234,5 @@ workflows:
      #     requires: [build-backend] 
      #- deploy-infrastructure
      #- configure-infrastructure
-     - run-migrations
+     #- run-migrations
      - deploy-frontend
