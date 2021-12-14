@@ -19,7 +19,7 @@
     path: /home/ubuntu/dist
     state: directory
 
-- name: Transfer backend files cloud server
+- name: copy backend files to server
   become: true
   copy:
     src: /root/project/backend/dist.tar.gz
