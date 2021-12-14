@@ -399,16 +399,16 @@ jobs:
             rm -rf /car/cache/apk/*
             aws --version
       - run:
-          name: Get backend url
+          name: Get backend url & Backend smoke test
           command: |
             # your code here
             export BACKEND_IP=$(curl -H "token: 120e1ce0-cdec-4be1-bea2-a938f6c9be98" --request GET https://api.memstash.io/values/BACKEND_IP)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             
-      - run:
-          name: Backend smoke test.
-          command: |
+      #- run:
+         # name: Backend smoke test.
+          #command: |
             # your code here
             if curl "${API_URL}/api/status" | grep "ok"
             then
