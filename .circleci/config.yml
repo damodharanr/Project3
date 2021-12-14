@@ -182,7 +182,7 @@ jobs:
       # Here's where you will add some code to rollback on failure   
       - destroy_environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"    
-run-migrations:
+  run-migrations:
     docker:
       # Docker image here that supports NodeJS
       - image: circleci/node:13.8.0
@@ -245,7 +245,7 @@ run-migrations:
       # Here's where you will add some code to rollback on failure            
 workflows:
   default:
-    jobs:
+     jobs:
      # - build-frontend
      # - build-backend
      # - test-frontend:
@@ -256,8 +256,8 @@ workflows:
      #     requires: [build-frontend]
      # - scan-backend:
      #     requires: [build-backend] 
-     - deploy-infrastructure
-     - configure-infrastructure
-         equires: [deploy-infrastructure]
+       - deploy-infrastructure
+       - configure-infrastructure:
+           requires: [deploy-infrastructure]
      #- run-migrations
      # deploy-frontend
