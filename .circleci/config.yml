@@ -277,7 +277,7 @@ workflows:
      # - scan-frontend:
      #     requires: [build-frontend]
      # - scan-backend:
-     #     requires: [build-backend] 
+     ##     requires: [build-backend] 
        - deploy-infrastructure
        - configure-infrastructure:
            requires: [deploy-infrastructure]
