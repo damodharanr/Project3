@@ -195,7 +195,7 @@ jobs:
           command: |
             # your code here
             yum install -y tar gzip
-            yum install -y nodejs
+            #yum install -y nodejs
             yum install -y npm
             yum install -y ansible
       - run:
