@@ -52,13 +52,16 @@ commands:
           when: on_fail
           command: |
             status=$(curl -H "token: cfc9a7fe-81a0-4286-bfce-aabc7dda974d" --request GET https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID:0:7})
-              echo $status
-              if [[ "$status" == "1" ]]
-              then
-                cd backend
-                npm install
-                npm run migrations:revert
-              fi
+            echo $status
+            if [[ "$status" == "1" ]]
+            then
+             cd backend
+             npm install
+             npm run migrations:revert
+            fi
+            echo "DB status="$status
+           
+              
 jobs:
   build-frontend:
     docker:
