@@ -1,4 +1,24 @@
 version: 2.1
+
+parameters:
+  workflow-id:
+    type: string
+    default: "${CIRCLE_WORKFLOW_ID}"
+    
+commands:
+  destroy_environment:
+    description: Destroy Cloud Stacks & infrastructure
+    parameters:
+      workflow_id:
+        type: string
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.workflow_id>>
+            aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.workflow_id>>
+            aws s3 rb s3://udapeople-<< parameters.workflow_id >> --force
 jobs:
   build-frontend:
     docker:
@@ -134,6 +154,8 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths: project/.circleci/ansible/inventory.txt
+      - destroy_environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"    
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
@@ -158,7 +180,9 @@ jobs:
             ansible-playbook -i inventory.txt configure-server.yml
             #exit 1
       # Here's where you will add some code to rollback on failure   
-  run-migrations:
+      - destroy_environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"    
+run-migrations:
     docker:
       # Docker image here that supports NodeJS
       - image: circleci/node:13.8.0
@@ -232,7 +256,8 @@ workflows:
      #     requires: [build-frontend]
      # - scan-backend:
      #     requires: [build-backend] 
-     #- deploy-infrastructure
-     #- configure-infrastructure
+     - deploy-infrastructure
+     - configure-infrastructure
+         equires: [deploy-infrastructure]
      #- run-migrations
-     - deploy-frontend
+     # deploy-frontend
