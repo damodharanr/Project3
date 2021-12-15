@@ -454,10 +454,9 @@ jobs:
             curl -H "Content-Type: text/plain" -H "token: cd2492b9-4bf1-45c9-9461-e821f12d2229" --request PUT --data "$Workflow-ID" https://api.memstash.io/values/WorkflowID
       - run:
           name: Update cloudfront distribution
-          command: |
-            # your code here
           working_directory: ./.circleci/files
           command: |
+            # your code here
             aws cloudformation deploy \
               --template-file cloudfront.yml \
               --stack-name udapeople-cloudfront-production \
