@@ -451,7 +451,7 @@ jobs:
             WorkflowID=$(aws cloudformation \
               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text)
-            curl -H "Content-Type: text/plain" -H "token: cd2492b9-4bf1-45c9-9461-e821f12d2229" --request PUT --data "$Workflow-ID" https://api.memstash.io/values/WorkflowID
+            curl -H "Content-Type: text/plain" -H "token: cd2492b9-4bf1-45c9-9461-e821f12d2229" --request PUT --data "$WorkflowID" https://api.memstash.io/values/WorkflowID
       - run:
           name: Update cloudfront distribution
           working_directory: ./.circleci/files
@@ -467,7 +467,29 @@ jobs:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
       - revert_migrations:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
-                
+  cleanup:
+    docker:
+      # Docker image here
+      - image: amazon/aws-cli
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Get old stack workflow id and cleanup old enviroment
+          command: |
+            # your code here
+            OldWorkflowID=$(curl -H "token: 7e6f4440-e8d4-41b2-9300-1ff02cdhjikj" --request GET https://api.memstash.io/values/WorkflowID)
+            CurrentWorkflowID1=${CIRCLE_WORKFLOW_ID:0:7}
+            if [[ "$CurrentWorkflowID" != "$OldWorkflowID" ]]
+            then
+              echo "$OldWorkflowID!=$CurrentWorkflowID => will delete old version"
+              aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+            else
+              echo "$OldWorkflowID==$CurrentWorkflowID => nothing needs to be done..."
+            fi
+          environment:
+            TERM: xterm-256color         
 workflows:
   default:
      jobs:
