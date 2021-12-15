@@ -456,7 +456,7 @@ jobs:
           name: Update cloudfront distribution
           command: |
             # your code here
-            working_directory: ./.circleci/files
+          working_directory: ./.circleci/files
           command: |
             aws cloudformation deploy \
               --template-file cloudfront.yml \
