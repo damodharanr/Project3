@@ -430,6 +430,45 @@ jobs:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
       - revert_migrations:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"    
+          
+  cloudfront-update:
+    docker:
+      # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+            curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+            yum -y install nodejs
+            yum -y install curl
+            - run:
+          name: Save workflow ID for further cleanup process
+          command: |
+            WorkflowID=$(aws cloudformation \
+              list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+              --no-paginate --output text)
+            curl -H "Content-Type: text/plain" -H "token: cd2492b9-4bf1-45c9-9461-e821f12d2229" --request PUT --data "$Workflow-ID" https://api.memstash.io/values/WorkflowID
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            # your code here
+            working_directory: ./.circleci/files
+          command: |
+            aws cloudformation deploy \
+              --template-file cloudfront.yml \
+              --stack-name udapeople-cloudfront-production \
+              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+              --tags project=udapeople
+      # Here's where you will add some code to rollback on failure        
+      - destroy_environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - revert_migrations:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+                
 workflows:
   default:
      jobs:
