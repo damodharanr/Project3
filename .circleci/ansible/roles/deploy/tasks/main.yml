@@ -29,5 +29,5 @@
     tar -xf dist.tar.gz
     rm -rf dist.tar.gz
     cd dist
-    sudo npm i
-    sudo pm2 start main.js --update-env
+    npm i
+    pm2 start main.js --update-env
