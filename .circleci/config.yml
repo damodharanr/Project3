@@ -350,6 +350,7 @@ jobs:
             # your code here
             apk add --update ansible
             apk add --update nodejs
+            apk add --update tar gzip
             apk add --update npm
             apk add --update curl
             apk add --no-cache tar
