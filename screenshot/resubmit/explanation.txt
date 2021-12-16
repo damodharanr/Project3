@@ -1,0 +1,19 @@
+1.	The presentation should create a proposal in document or presentation form that “sells” the concept of CI/CD to non-technical decision-makers in the UdaPeople organization.  
+ 
+ presentation attached in screenshot/resubmit folder 
+
+2.	Fix and upgrade the "standard-version". Package should be version => 7. – 
+
+Already used command npm audit fix --audit-level=critical –force in backend, not sure why it is highlighted. Please refer config.yml scan backend section. 
+
+3.	Fix SCREENSHOT08: Console output of successful promotion of new version to production in CloudFront.
+
+Attached in folder screenshot/resubmit
+
+
+4.	Fix URL02: Deployed and functioning S3 front-end application (s3-website).
+http://udapeople-a092bf1.s3-website-us-east-1.amazonaws.com/
+
+5.	Fix SCREENSHOT12: Evidence that Prometheus and AlertManager send alerts when certain conditions exist in the EC2 instance.
+
+Attached in folder screenshot/resubmit
