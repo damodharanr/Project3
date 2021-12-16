@@ -166,6 +166,7 @@ jobs:
             # npm install oauth-sign@^0.9.0
             # npm audit --audit-level=critical
             npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
       - save_cache:
           paths: [backend/node_modules]
           key: backend-scan
@@ -257,7 +258,7 @@ jobs:
       - run:
           name: Run migrations
           working_directory: ./backend
-          command: |   
+          command: |
             echo ENVIROMENT=$ENVIROMENT > ".env"
             echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> ".env"
             echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> ".env"
@@ -368,7 +369,22 @@ jobs:
             npm i
             cd ..
             tar -czf dist.tar.gz dist
-            
+      - run:
+          name: Configure env variables
+          command:  |
+            touch backend/.env
+            echo ENVIRONMENT=production >> "backend/.env"
+            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
+            echo TYPEORM_ENTITIES=./src/modules/**/*.entity.ts >> "backend/.env"
+            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
+            echo TYPEORM_HOST="$TYPEORM_HOST" >> "backend/.env"
+            echo TYPEORM_PORT="$TYPEORM_PORT" >> "backend/.env"
+            echo TYPEORM_USERNAME="$TYPEORM_USERNAME" >> "backend/.env"
+            echo TYPEORM_PASSWORD="$TYPEORM_PASSWORD" >> "backend/.env"
+            echo TYPEORM_DATABASE="$TYPEORM_DATABASE" >> "backend/.env"
+            echo NODE_ENV=local >> "backend/.env"
+            cat backend/.env      
       - run:
           name: Deploy backend - part 2
           working_directory: ./.circleci/ansible
