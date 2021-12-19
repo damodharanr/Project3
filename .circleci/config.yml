@@ -284,10 +284,10 @@ jobs:
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
             echo "DB migration was successful"
-            curl -H "Content-Type: text/plain" -H "token: cfc9a7fe-81a0-4286-bfce-aabc7dda974d" --request PUT --data "1" https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID:0:7}
+            # curl -H "Content-Type: text/plain" -H "token: cfc9a7fe-81a0-4286-bfce-aabc7dda974d" --request PUT --data "1" https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID:0:7}
             else
               echo "DB migration failed"
-              curl -H "Content-Type: text/plain" -H "token: cfc9a7fe-81a0-4286-bfce-aabc7dda974d" --request PUT --data "0" https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID:0:7}
+              # curl -H "Content-Type: text/plain" -H "token: cfc9a7fe-81a0-4286-bfce-aabc7dda974d" --request PUT --data "0" https://api.memstash.io/values/migration_status_${CIRCLE_WORKFLOW_ID:0:7}
             fi
             #exit 1
       # Here's where you will add some code to rollback on failure      
@@ -538,7 +538,7 @@ workflows:
            requires: [run-migrations, deploy-backend]
       - smoke-test:
           requires: [deploy-frontend, deploy-backend]
-      - cloudfront-update:
-          requires: [smoke-test]
-      - cleanup: 
-          requires: [cloudfront-update]
+      #- cloudfront-update:
+      #    requires: [smoke-test]
+      #- cleanup: 
+      #    requires: [cloudfront-update]
