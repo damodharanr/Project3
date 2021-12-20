@@ -334,63 +334,51 @@ jobs:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
       - revert_migrations:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+          #fingerprints: ["e3:11:4f:ab:2a:78:cb:96:06:90:5c:37:dd:bf:fd:48"] # You can get this ID in the section where you registered the SSH Key
   deploy-backend:
     docker:
-      # Docker image here that supports Ansible
-      - image: python:3.7-alpine3.11
+       - image: python:3.7-alpine3.11
     steps:
-      # Checkout code from git
-      # Add ssh keys with fingerprint
-      # attach workspace
       - checkout
-      - add_ssh_keys:
-          fingerprints: ["e3:11:4f:ab:2a:78:cb:96:06:90:5c:37:dd:bf:fd:48"] # You can get this ID in the section where you registered the SSH Key
+      - add_ssh_keys: 
+          fingerprints: ["e3:11:4f:ab:2a:78:cb:96:06:90:5c:37:dd:bf:fd:48"]
       - attach_workspace:
-          at: .
+          at: ~/
       - run:
-          name: Install dependencies
+          name: Install ansible
           command: |
-            # your code here
             apk add --update ansible
-            apk add --update nodejs
-            apk add --update tar gzip
-            apk add --update npm
-            apk add --update curl
-            apk add --no-cache tar
-            pip3 install awscli
       - run:
-          name: Deploy backend - part 1 
+          name: install tar
+          command: apk add --update tar gzip
+      - run:
+          name: install curl
+          command: apk add --update curl
+      - run:
+          name: Install node 
           command: |
-            # your code here
+            apk add --update nodejs           
+      - run:
+          name: Install npm
+          command: |
+            apk add --update npm
+      - run:
+          name: Install aws cli
+          command: |
+            pip install awscli   
+      - run:
+          name: Deploy backend
+          command: |
             cd backend
-            npm install -g npm@latest
             npm i
             npm run build
-            cp package* ./dist
-            cd dist
-            npm i
-            cd ..
-            tar -czf dist.tar.gz dist
-      - run:
-          name: Configure env variables
-          command:  |
-            #touch backend/.env
-            #echo ENVIRONMENT=production >> "backend/.env"
-            #echo TYPEORM_CONNECTION=postgres >> "backend/.env"
-            #echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-            #echo TYPEORM_ENTITIES=./src/modules/**/*.entity.ts >> "backend/.env"
-            #echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
-            #echo TYPEORM_HOST="$TYPEORM_HOST" >> "backend/.env"
-            #echo TYPEORM_PORT="$TYPEORM_PORT" >> "backend/.env"
-            #echo TYPEORM_USERNAME="$TYPEORM_USERNAME" >> "backend/.env"
-            #echo TYPEORM_PASSWORD="$TYPEORM_PASSWORD" >> "backend/.env"
-            #echo TYPEORM_DATABASE="$TYPEORM_DATABASE" >> "backend/.env"
-            #echo NODE_ENV=local >> "backend/.env"
-            #cat backend/.env      
-      - run:
-          name: Deploy backend - part 2
-          working_directory: ./.circleci/ansible
-          command: |
+            cd ..   
+            tar -C backend -czvf artifact.tar.gz .
+            pwd
+            mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
+            mv artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
             ansible-playbook -i inventory.txt node-exporter.yml
