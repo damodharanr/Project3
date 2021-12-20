@@ -343,7 +343,7 @@ jobs:
       - add_ssh_keys: 
           fingerprints: ["e3:11:4f:ab:2a:78:cb:96:06:90:5c:37:dd:bf:fd:48"]
       - attach_workspace:
-          at: ~/
+          at: .
       - run:
           name: Install ansible
           command: |
