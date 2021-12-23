@@ -12,7 +12,7 @@ Attached in folder screenshot/resubmit
 
 
 4.	Fix URL02: Deployed and functioning S3 front-end application (s3-website).
-http://udapeople-a092bf1.s3-website-us-east-1.amazonaws.com/
+http://udapeople-7d34d8c.s3-website-us-east-1.amazonaws.com/#/employees
 
 5.	Fix SCREENSHOT12: Evidence that Prometheus and AlertManager send alerts when certain conditions exist in the EC2 instance.
 
