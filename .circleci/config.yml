@@ -319,7 +319,7 @@ jobs:
             cat frontend/.env
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
-            curl -H "Content-Type: text/plain" -H "token: 120e1ce0-cdec-4be1-bea2-a938f6c9be98" --request PUT --data "$BACKEND_IP" https://api.memstash.io/values/BACKEND_IP
+            #curl -H "Content-Type: text/plain" -H "token: 120e1ce0-cdec-4be1-bea2-a938f6c9be98" --request PUT --data "$BACKEND_IP" https://api.memstash.io/values/BACKEND_IP
       - run:
           name: Deploy frontend objects
           command: |
@@ -413,7 +413,8 @@ jobs:
           name: Get backend url and Backend smoke test
           command: |
             # your code here
-            export BACKEND_IP=$(curl -H "token: 120e1ce0-cdec-4be1-bea2-a938f6c9be98" --request GET https://api.memstash.io/values/BACKEND_IP)
+            #export BACKEND_IP=$(curl -H "token: 120e1ce0-cdec-4be1-bea2-a938f6c9be98" --request GET https://api.memstash.io/values/BACKEND_IP)
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
@@ -458,10 +459,12 @@ jobs:
       - run:
           name: Save workflow ID for further cleanup process
           command: |
-            WorkflowID=$(aws cloudformation \
+            OldWorkflowID=$(aws cloudformation \
               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text)
-            curl -H "Content-Type: text/plain" -H "token: c07ea3a7-35c3-4f9d-9f2e-01129d99a56a" --request PUT --data "$WorkflowID" https://api.memstash.io/values/WorkflowID
+            #curl -H "Content-Type: text/plain" -H "token: c07ea3a7-35c3-4f9d-9f2e-01129d99a56a" --request PUT --data "$WorkflowID" https://api.memstash.io/values/WorkflowID
+            echo $OldWorkflowID > ~/OldWorkflowID.txt
+            cat ~/OldWorkflowID.txt
       - run:
           name: Update cloudfront distribution
           working_directory: ./.circleci/files
@@ -472,6 +475,10 @@ jobs:
               --stack-name InitialStack \
               --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
               --tags project=udapeople
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - OldWorkflowID.txt        
       # Here's where you will add some code to rollback on failure        
       - destroy_environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
@@ -484,11 +491,15 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
+      - attach_workspace:
+          at: ~/  
       - run:
           name: Get old stack workflow id and cleanup old enviroment
           command: |
+            export OldWorkflowID=$(cat ~/OldWorkflowID.txt)
+            echo OldWorkflowID:"${OldWorkflowID}"
             # your code here
-            OldWorkflowID=$(curl -H "token: c07ea3a7-35c3-4f9d-9f2e-01129d99a56a" --request GET https://api.memstash.io/values/WorkflowID)
+            #OldWorkflowID=$(curl -H "token: c07ea3a7-35c3-4f9d-9f2e-01129d99a56a" --request GET https://api.memstash.io/values/WorkflowID)
             CurrentWorkflowID1=${CIRCLE_WORKFLOW_ID:0:7}
             if [[ "$CurrentWorkflowID" != "$OldWorkflowID" ]]
             then
@@ -503,18 +514,18 @@ jobs:
 workflows:
   default:
      jobs:
-      #- build-frontend
-      #- build-backend
-      #- test-frontend:
-      #    requires: [build-frontend]
-      #- test-backend:
-      #    requires: [build-backend]
-      #- scan-frontend:
-      #    requires: [build-frontend]
-      #- scan-backend:
-      #    requires: [build-backend] 
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
+      - scan-backend:
+          requires: [build-backend] 
       - deploy-infrastructure:
-          #requires: [test-frontend, test-backend, scan-backend, scan-frontend]
+          requires: [test-frontend, test-backend, scan-backend, scan-frontend]
           filters:
             branches:
               only:
@@ -525,11 +536,11 @@ workflows:
            requires: [configure-infrastructure]
       - deploy-backend:
           requires: [run-migrations]
-      #- deploy-frontend:
-      #     requires: [run-migrations, deploy-backend]
-      #- smoke-test:
-      #    requires: [deploy-frontend, deploy-backend]
-      #- cloudfront-update:
-      #    requires: [smoke-test]
-      #- cleanup: 
-      #    requires: [cloudfront-update]
+      - deploy-frontend:
+           requires: [run-migrations, deploy-backend]
+      - smoke-test:
+          requires: [deploy-frontend, deploy-backend]
+      - cloudfront-update:
+          requires: [smoke-test]
+      - cleanup: 
+          requires: [cloudfront-update]
